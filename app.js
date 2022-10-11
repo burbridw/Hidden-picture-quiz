@@ -1,8 +1,10 @@
 let activeArr = []
 let selectArr = []
 let quizImageArr = []
+let coverImageArr = []
 let displayArr = []
-let quizImageChosen = false
+let quizImageSet = false
+let coverImageSet = false
 let gameHasStarted = false
 let goBackBtn = ""
 let imgList = ""
@@ -177,6 +179,8 @@ const quickStart = document.getElementById("quick-start")
 const clearBtn = document.getElementById("clear")
 const renderBtn = document.getElementById("render-btn")
 const changeBtn = document.getElementById("change")
+const quizImageBtn = document.getElementById("set-quiz-image")
+const coverImageBtn = document.getElementById("set-cover-image")
 
 feelingsBtn.addEventListener("click",() => beginSelection(feelingsArr))
 weatherBtn.addEventListener("click",() => beginSelection(weatherArr))
@@ -304,14 +308,46 @@ function passSelect() {
     
 }
 
-renderBtn.addEventListener("click", function() {
-    if (activeArr.length >= 1 && !quizImageChosen) {
+quizImageBtn.addEventListener("click",function() {
+    if (activeArr.length >= 1 && !quizImageSet) {
         quizImageArr = activeArr
         activeArr = []
-        renderBtn.textContent = "Choose Cover Images"
-        quizImageChosen = true
-    } else if (activeArr.length >= 1 && quizImageChosen) {
-        renderGame(activeArr)
+        quizImageBtn.textContent = "READY"
+        quizImageBtn.classList.add("ready")
+        quizImageSet = true
+    }   
+    if ( quizImageSet && coverImageSet) {
+        coverImageBtn.classList.add("hide-me")
+        quizImageBtn.classList.add("hide-me")
+        renderBtn.classList.remove("hide-me")
+    }
+})
+
+coverImageBtn.addEventListener("click",function() {
+    if (activeArr.length >= 12) {
+        coverImageArr = activeArr
+        activeArr = []
+        coverImageSet = true
+        coverImageBtn.textContent = "READY"
+        coverImageBtn.classList.add("ready")
+    } else if (activeArr.length < 12) {
+        coverImageBtn.textContent = "Not Enough Images"
+        coverImageBtn.classList.add("warning")
+        setTimeout( () => {
+        coverImageBtn.textContent = "Set Cover Images"
+        coverImageBtn.classList.remove("warning")
+        }, 3000)
+    }
+    if ( quizImageSet && coverImageSet) {
+        coverImageBtn.classList.add("hide-me")
+        quizImageBtn.classList.add("hide-me")
+        renderBtn.classList.remove("hide-me")
+    }
+})
+
+renderBtn.addEventListener("click", function() {
+    if (quizImageSet && coverImageSet) {
+        renderGame(coverImageArr)
         gameHasStarted = true
         renderBtn.textContent = "Reset"
     }   
@@ -328,7 +364,7 @@ changeBtn.addEventListener("click",function(){
             x.classList.remove("see-thru")
         }
     })
-    if ( gameType === 16) {
+    if ( gameType === 16 ) {
         gameType = 20
         gameSixteen.classList.add("hide-me")
         gameTwenty.classList.remove("hide-me")
@@ -347,7 +383,6 @@ changeBtn.addEventListener("click",function(){
 }
 })
 
-activeArr = ["./images/animals/img1.png","./images/animals/img2.png", "./images/animals/img3.png", "./images/animals/img4.png", "./images/animals/img5.png", "./images/animals/img6.png", "./images/animals/img7.png", "./images/animals/img8.png", "./images/animals/img9.png", "./images/animals/img10.png", "./images/animals/img11.png", "./images/animals/img12.png", "./images/animals/img13.png", "./images/animals/img14.png", "./images/animals/img15.png", "./images/animals/img16.png", "./images/animals/img17.png", "./images/animals/img18.png", "./images/animals/img19.png", "./images/animals/img20.png", "./images/animals/img21.png", "./images/animals/img22.png", "./images/animals/img23.png", "./images/animals/img24.png"]
 
 function renderGame(arr){
     if ( !topicBtnDisplay.classList.contains("hide-me") ) {
@@ -364,9 +399,7 @@ function renderGame(arr){
             x.classList.add("hide-me")
         }
     })
-
     let quizImageNumber = Math.floor( Math.random()*quizImageArr.length )
-
     quizImage = quizImageArr[quizImageNumber]
     let quizBoxNumber = Math.floor( Math.random()*11 )
     let currentQuizBox = quizImageContainer.children[quizBoxNumber]
@@ -374,7 +407,35 @@ function renderGame(arr){
     currentQuizBox.classList.remove("hide-me")
 
     displayArr = arr.sort( () => { return 0.5 - Math.random() } )
+
+    if ( gameType !== 12 && displayArr.length < 16 ) {
+        gameType = 12
+        changeBtn.textContent = 12
+        changeBtn.classList.add("warning")
+        setTimeout( () => {
+        changeBtn.classList.remove("warning")
+        }, 3000)
+        if ( !gameTwenty.classList.contains("hide-me") ) {
+        gameTwenty.classList.add("hide-me")
+        }
+        if ( !gameSixteen.classList.contains("hide-me") ) {
+            gameSixteen.classList.add("hide-me")
+        }
+        gameTwelve.classList.remove("hide-me")
+    } else if ( gameType === 20 && displayArr.length < 20 ) {
+        gameType = 16
+        changeBtn.textContent = 16
+        changeBtn.classList.add("warning")
+        setTimeout( () => {
+        changeBtn.classList.remove("warning")
+        }, 3000)
+        if ( !gameTwenty.classList.contains("hide-me") ) {
+        gameTwenty.classList.add("hide-me")
+        }
+        gameSixteen.classList.remove("hide-me")
+    }
     
+
     for ( let i = 0; i < gameType; i++ ) {
         if ( gameType === 16 ) {
             let currentGrid = document.querySelector(".sixteen")
@@ -390,7 +451,6 @@ function renderGame(arr){
             currentImageBox.innerHTML = `<img src="${displayArr[i]}">`
         }
     }
-
     cardsContainer.classList.remove("reduced")
 }
 
@@ -403,19 +463,30 @@ gameImageBoxes.forEach( (x) => {
 
 
 function clearAll() {
-    renderBtn.textContent = "Choose Quiz Images"
     cardsContainer.classList.add("reduced")
     gameImageBoxes.forEach( (x) => {
         if ( x.classList.contains("see-thru") ) {
             x.classList.remove("see-thru")
         }
+        x.innerHTML = ""
     })
     let currenterDiv = document.getElementById("select-container")
     currenterDiv.innerHTML = ""
     activeArr = []
     selectArr = []
-    quizImageChosen = false
+    quizImageArr = []
+    coverImageArr = []
+    quizImageSet = false
+    coverImageSet = false
     gameHasStarted = false
+    renderBtn.classList.add("hide-me")
+    renderBtn.textContent = "Begin the Game"
+    quizImageBtn.classList.remove("hide-me")
+    coverImageBtn.classList.remove("hide-me")
+    quizImageBtn.classList.remove("ready")
+    coverImageBtn.classList.remove("ready")
+    quizImageBtn.textContent = "Set Quiz Images"
+    coverImageBtn.textContent = "Set Cover Images"
     topicBtnDisplay.classList.remove("hide-me")
     document.querySelectorAll(`.toggleOn`).forEach( (x) => {
     x.className = "toggleOff"
