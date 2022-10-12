@@ -250,6 +250,7 @@ function renderSelect(targetDiv, arr){
     currentDiv.innerHTML = `<div class="inner-btn-menu"><button id="selectall" onClick="selectAll()">All</button><button id="clearselection" onClick="selectClear()">Clear</button><button id="closewindow" onClick="passSelect()">Confirm and Go Back</button></div>`
     for ( let i = 0; i < arr.length; i++) {
     currentDiv.innerHTML += `<div class="img-box"><img class="select-img unselected" src="${arr[i]}"></div>`
+    }
     imgList = document.querySelectorAll(`.select-img`)
     imgList.forEach( (img) => {
         let reselectImg = img.getAttribute("src")
@@ -273,7 +274,6 @@ function renderSelect(targetDiv, arr){
             }
         }) 
     })
-    } 
 }
 
 function selectAll() {
@@ -284,14 +284,13 @@ function selectAll() {
         selectArr.push(currentImg)
         img.classList.add("selected")
         img.classList.remove("unselected")
-    })
+    }) 
 }
 
 function selectClear() {
     selectArr = []
     imgList = document.querySelectorAll(`.select-img`)
     imgList.forEach( (img) => {
-        let currentImg = img.getAttribute("src")
         img.classList.remove("selected")
         img.classList.add("unselected")
     })
@@ -315,7 +314,13 @@ quizImageBtn.addEventListener("click",function() {
         quizImageBtn.textContent = "READY"
         quizImageBtn.classList.add("ready")
         quizImageSet = true
-    }   
+    }  else if ( activeArr.length < 1 && !quizImageSet) {
+        quizImageBtn.textContent = "Not Enough Images"
+        quizImageBtn.classList.add("warning")
+        setTimeout( () => {
+        quizImageBtn.textContent = "Set Quiz Images"
+        quizImageBtn.classList.remove("warning")
+        }, 3000)}
     if ( quizImageSet && coverImageSet) {
         coverImageBtn.classList.add("hide-me")
         quizImageBtn.classList.add("hide-me")
