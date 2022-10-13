@@ -406,7 +406,7 @@ function renderGame(arr){
     })
     let quizImageNumber = Math.floor( Math.random()*quizImageArr.length )
     quizImage = quizImageArr[quizImageNumber]
-    let quizBoxNumber = Math.floor( Math.random()*11 )
+    let quizBoxNumber = Math.floor( Math.random()*16 )
     let currentQuizBox = quizImageContainer.children[quizBoxNumber]
     currentQuizBox.innerHTML = `<img src="${quizImage}">`
     currentQuizBox.classList.remove("hide-me")
