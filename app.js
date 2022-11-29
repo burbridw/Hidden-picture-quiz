@@ -6,11 +6,10 @@ let displayArr = []
 let quizImageSet = false
 let coverImageSet = false
 let gameHasStarted = false
-let goBackBtn = ""
 let imgList = ""
 let quizImage = ""
 let selectionOpen = false
-let gameType = 16
+let gameType = 12
 
 const gameBtnDisplay = document.getElementById("game-btn-container")
 const topicBtnDisplay = document.getElementById("topic-btn-container")
@@ -22,7 +21,6 @@ const quizImageBoxes = document.querySelectorAll(".quiz-image-box")
 const gameTwelve = document.querySelector(".twelve")
 const gameSixteen = document.querySelector(".sixteen")
 const gameTwenty = document.querySelector(".twenty")
-
 
 const feelingsArr = ["./images/feelings/img1.png","./images/feelings/img2.png", "./images/feelings/img3.png", "./images/feelings/img4.png", "./images/feelings/img5.png", "./images/feelings/img6.png", "./images/feelings/img7.png", "./images/feelings/img8.png", "./images/feelings/img9.png","./images/feelings/img10.png"]
 const feelingsTextArr = ["fine", "good", "great", "happy", "sad", "tired", "sleepy", "busy", "hungry", "thirsty"]
@@ -123,9 +121,6 @@ const clubactivitiesTextArr = ["baseball team", "softball team", "basketball tea
 
 const allImagesArr = feelingsArr.concat(numbersArr).concat(weatherArr).concat(colorArr).concat(shapesArr).concat(sportsArr).concat(foodsArr).concat(dessertsArr).concat(drinksArr).concat(fruitsvegetablesArr).concat(ingredientsArr).concat(mealsArr).concat(tastesArr).concat(animalsArr).concat(seaanimalsArr).concat(bugsArr).concat(natureArr).concat(monthsArr).concat(seasonsArr).concat(timesofdayArr).concat(daysArr).concat(countriesArr).concat(familyArr).concat(peopleArr).concat(personalitiesArr).concat(actions1Arr).concat(pastactionsArr).concat(actions2Arr).concat(dailyactivitiesArr).concat(frequencyArr).concat(bodyArr).concat(clothesArr).concat(buildingsArr).concat(directionsArr).concat(locationsArr).concat(vehiclesArr).concat(schoolArr).concat(subjectsArr).concat(instrumentsArr).concat(stationaryArr).concat(commonitemsArr).concat(activitiesArr).concat(schooleventsArr).concat(yearlyeventsArr).concat(conditionsArr).concat(descriptionsArr).concat(jobsArr).concat(clubactivitiesArr)
 const allTextArr = feelingsTextArr.concat(numbersTextArr).concat(weatherTextArr).concat(colorTextArr).concat(shapesTextArr).concat(sportsTextArr).concat(foodsTextArr).concat(dessertsTextArr).concat(drinksTextArr).concat(fruitsvegetablesTextArr).concat(ingredientsTextArr).concat(mealsTextArr).concat(tastesTextArr).concat(animalsTextArr).concat(seaanimalsTextArr).concat(bugsTextArr).concat(natureTextArr).concat(monthsTextArr).concat(seasonsTextArr).concat(timesofdayTextArr).concat(daysTextArr).concat(countriesTextArr).concat(familyTextArr).concat(peopleTextArr).concat(personalitiesTextArr).concat(actions1TextArr).concat(pastactionsTextArr).concat(actions2TextArr).concat(dailyactivitiesTextArr).concat(frequencyTextArr).concat(bodyTextArr).concat(clothesTextArr).concat(buildingsTextArr).concat(directionsTextArr).concat(locationsTextArr).concat(vehiclesTextArr).concat(schoolTextArr).concat(subjectsTextArr).concat(instrumentsTextArr).concat(stationaryTextArr).concat(commonitemsTextArr).concat(activitiesTextArr).concat(schooleventsTextArr).concat(yearlyeventsTextArr).concat(conditionsTextArr).concat(descriptionsTextArr).concat(jobsTextArr).concat(clubactivitiesTextArr)
-
-
-
 
 const feelingsBtn = document.getElementById("feelings")
 const weatherBtn = document.getElementById("weather")
@@ -309,7 +304,7 @@ function passSelect() {
 
 quizImageBtn.addEventListener("click",function() {
     if (activeArr.length >= 1 && !quizImageSet) {
-        quizImageArr = activeArr
+        quizImageArr = activeArr.slice(0, activeArr.length)
         activeArr = []
         quizImageBtn.textContent = "READY"
         quizImageBtn.classList.add("ready")
@@ -373,21 +368,32 @@ changeBtn.addEventListener("click",function(){
         gameType = 20
         gameSixteen.classList.add("hide-me")
         gameTwenty.classList.remove("hide-me")
+        quizImageContainer.classList.remove("quizsixteen")
+        quizImageContainer.classList.add("quiztwenty")
         changeBtn.textContent = 20
     } else if ( gameType === 20 ) {
         gameType = 12
         gameTwenty.classList.add("hide-me")
         gameTwelve.classList.remove("hide-me")
+        quizImageContainer.classList.remove("quiztwenty")
         changeBtn.textContent = 12
     } else if ( gameType === 12 ) {
         gameType = 16
         gameTwelve.classList.add("hide-me")
         gameSixteen.classList.remove("hide-me")
+        quizImageContainer.classList.add("quizsixteen")
         changeBtn.textContent = 16
+    }
+    quizImageContainer.innerHTML = ""
+    for ( let i = 0; i < gameType; i++ ) {
+        quizImageContainer.innerHTML += `
+        <div class="quiz-image-box"></div>`
+    }
+    if ( gameHasStarted ) {
+        renderGame(coverImageArr)
     }
 }
 })
-
 
 function renderGame(arr){
     if ( !topicBtnDisplay.classList.contains("hide-me") ) {
@@ -398,24 +404,23 @@ function renderGame(arr){
             x.classList.remove("see-thru")
         }
     })
-    quizImageBoxes.forEach( (x) => {
-        x.innerHTML = ""
-        if ( !x.classList.contains("hide-me") ) {
-            x.classList.add("hide-me")
-        }
-    })
+    quizImageContainer.innerHTML = ""
+    for ( let i = 0; i < gameType; i++ ) {
+        quizImageContainer.innerHTML += `
+        <div class="quiz-image-box"></div>`
+    }
+
     let quizImageNumber = Math.floor( Math.random()*quizImageArr.length )
     quizImage = quizImageArr[quizImageNumber]
-    let quizBoxNumber = Math.floor( Math.random()*16 )
-    let currentQuizBox = quizImageContainer.children[quizBoxNumber]
-    currentQuizBox.innerHTML = `<img src="${quizImage}">`
-    currentQuizBox.classList.remove("hide-me")
+    let quizBoxNumber = Math.floor( Math.random()*gameType )
+    quizImageContainer.children[quizBoxNumber].innerHTML = `<img class="quiz-image" src="${quizImage}">`
 
-    displayArr = arr.sort( () => { return 0.5 - Math.random() } )
+    displayArr = arr.slice(0,arr.length).sort( () => { return 0.5 - Math.random() } )
 
-    if ( gameType !== 12 && displayArr.length < 16 ) {
+    if ( (gameType !== 12 && displayArr.length < 16) || ( gameType === 20 && displayArr.length < 20 ) ) {
         gameType = 12
         changeBtn.textContent = 12
+        quizImageContainer.className = "quiz-image-container"
         changeBtn.classList.add("warning")
         setTimeout( () => {
         changeBtn.classList.remove("warning")
@@ -427,20 +432,8 @@ function renderGame(arr){
             gameSixteen.classList.add("hide-me")
         }
         gameTwelve.classList.remove("hide-me")
-    } else if ( gameType === 20 && displayArr.length < 20 ) {
-        gameType = 16
-        changeBtn.textContent = 16
-        changeBtn.classList.add("warning")
-        setTimeout( () => {
-        changeBtn.classList.remove("warning")
-        }, 3000)
-        if ( !gameTwenty.classList.contains("hide-me") ) {
-        gameTwenty.classList.add("hide-me")
-        }
-        gameSixteen.classList.remove("hide-me")
     }
     
-
     for ( let i = 0; i < gameType; i++ ) {
         if ( gameType === 16 ) {
             let currentGrid = document.querySelector(".sixteen")
@@ -459,13 +452,11 @@ function renderGame(arr){
     cardsContainer.classList.remove("reduced")
 }
 
-
 gameImageBoxes.forEach( (x) => {
     x.addEventListener("click",function() {
         x.classList.add("see-thru")
     })
 })
-
 
 function clearAll() {
     cardsContainer.classList.add("reduced")
